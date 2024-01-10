@@ -1,10 +1,10 @@
-import React from 'react';
-
+import React from "react";
+import ListOfSchedules from "./components/ListOfSchedules";
 function App() {
   return (
-    <div className="App">
-     Hello
-    </div>
+    <>
+      <ListOfSchedules />
+    </>
   );
 }
 
