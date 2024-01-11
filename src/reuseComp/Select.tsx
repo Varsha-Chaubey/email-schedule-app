@@ -21,7 +21,7 @@ const Select: React.FC<SelectProps> = ({ label,options, value, onChange }):JSX.E
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
-        {/* <option>{"Select..."}</option> */}
+        <option>{""}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
