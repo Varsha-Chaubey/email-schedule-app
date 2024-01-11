@@ -1,26 +1,87 @@
-import React, { useState } from "react";
+import React, { type JSX, useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
+import fetchHelper from "../api";
+
+import Table from "../reuseComp/Table";
+import DeleteScheduleModal from "./DeleteScheduleModal";
+import ScheduleModal from "./ScheduleModal";
+
 import searchImg from "./../assests/search.svg";
 import addImg from "./../assests/add-icn.svg";
-import editImg from "./../assests/edit-18x18.svg";
-import deleteImg from "./../assests/delete.png";
-import AddScheduleModal from "./AddScheduleModal";
-import DeleteScheduleModal from "./DeleteScheduleModal";
-const ListOfSchedules: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const handleAddModal = () => {
-    setIsModalOpen(!isModalOpen);
+import "react-toastify/dist/ReactToastify.css";
+
+interface ScheduleItem {
+  _id: number;
+  title: string;
+  description: string;
+  subject: string;
+  frequency: string;
+  time: string;
+  repeat: string;
+}
+
+const ListOfSchedules: React.FC = (): JSX.Element => {
+  const [loadingData, setLoadingData] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [scheduleData, setScheduleData] = useState<ScheduleItem[]>([]);
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [editData, setEditData] = useState<ScheduleItem>();
+const [scheduleID, setScheduleID] = useState<ScheduleItem>();
+
+  const handleAddModal = (item: any): void => {
+    setIsModalOpen((prev: boolean) => !prev);
   };
 
-  const handleEditModal = () => {
-    setIsEditModalOpen(!isEditModalOpen);
+  const handleEditModal = (item: ScheduleItem) => {
+    setEditData(item);
+    setIsEditModalOpen((prev: boolean) => !prev);
   };
 
-  const handleDeleteModal = () => {
-    setIsDeleteModalOpen(!isDeleteModalOpen);
+  const handleDeleteModal = (item: ScheduleItem) => {
+    setScheduleID(item)
+    setIsDeleteModalOpen((prev: boolean) => !prev);
   };
+
+  const fetchData = async () => {
+    try {
+      const response = await fetchHelper({
+        url: "get",
+      });
+      setScheduleData(response);
+      setLoadingData(false);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  const fetchSearchData = async () => {
+    try {
+      let url = "search";
+      if (searchKeyword.trim() !== "") {
+        url += `?title=${encodeURIComponent(searchKeyword)}`;
+      }
+      const response = await fetchHelper({ url });
+      setScheduleData(response);
+    } catch (error: any) {
+      console.error("Error fetching search data:", error.message);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (searchKeyword.trim() !== "") {
+      fetchSearchData();
+    }
+  }, [searchKeyword]);
+
   return (
     <>
       <div className="main flex flex-col sm:flex-row bg-gray-100">
@@ -35,8 +96,10 @@ const ListOfSchedules: React.FC = () => {
                   type="text"
                   placeholder="Search"
                   className="border-none outline-none search-color font-bold w-full"
-                  // value={searchTerm}
-                  // onChange={handleSearch}
+                  value={searchKeyword}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setSearchKeyword(e.target.value);
+                  }}
                 />
                 <img src={searchImg} alt="" className="ml-2" />
               </div>
@@ -52,63 +115,27 @@ const ListOfSchedules: React.FC = () => {
                 <button className="text-white">Add</button>
               </button>
             </div>
-            <table className="mt-8 border-collapse border-2 w-full sm:w-auto">
-              <thead className="bg-gray-300 w-full">
-                <tr className="text-left">
-                  <th className="py-2 px-6 text-left" style={{ width: "10%" }}>
-                    Title
-                  </th>
-                  <th className="py-2 px-6 text-left" style={{ width: "40%" }}>
-                    Description
-                  </th>
-                  <th className="py-2 px-6 text-left" style={{ width: "10%" }}>
-                    Subject
-                  </th>
-                  <th className="py-2 px-6 text-left" style={{ width: "10%" }}>
-                    Schedule
-                  </th>
-                  <th className="py-2 px-6 text-left" style={{ width: "10%" }}>
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr key={1} className="text-sm bottom-border">
-                  <td className="my-2 pl-6 text-left">{"Sample text"}</td>
-                  <td className="my-2 pl-6 text-left description">
-                    {
-                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                    }
-                  </td>
-                  <td className="my-2 pl-6 text-left">
-                    {"emailSchedule.subject"}
-                  </td>
-                  <td className="my-2 pl-6 text-left">
-                    {"emailSchedule.Schedule"}
-                  </td>
-                  <td className="my-2 px-6 text-left">
-                    <button className="mr-2" onClick={handleEditModal}>
-                      <img src={editImg} alt="" />
-                    </button>
-                    <button onClick={handleDeleteModal}>
-                      <img src={deleteImg} alt="" className="h-5 w-4" />
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <Table
+              loading={loadingData}
+              scheduleList={scheduleData}
+              onEditClick={handleEditModal}
+              onDeleteClick={handleDeleteModal}
+            />
           </div>
-          <AddScheduleModal
-            isOpen={isModalOpen}
-            onClose={handleAddModal}
-            editTrue={false}
+          <ScheduleModal
+            key={+isEditModalOpen}
+            isOpen={isEditModalOpen || isModalOpen}
+            onClose={isModalOpen ? handleAddModal : handleEditModal}
+            fetchData={fetchData}
+            editData={editData}
           />
-          <AddScheduleModal
-            isOpen={isEditModalOpen}
-            onClose={handleEditModal}
-            editTrue={isEditModalOpen}
+          <DeleteScheduleModal
+            isOpen={isDeleteModalOpen}
+            onClose={handleDeleteModal}
+            fetchData={fetchData}
+            scheduleID={scheduleID}
           />
-          <DeleteScheduleModal isOpen={isDeleteModalOpen} onClose={handleDeleteModal}/>
+          <ToastContainer autoClose={2000} />
         </div>
       </div>
     </>

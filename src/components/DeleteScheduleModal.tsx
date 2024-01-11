@@ -1,10 +1,35 @@
-import React from "react";
+import React, { type JSX } from "react";
+import fetchHelper from "../api";
+import { toast } from "react-toastify";
 
+
+interface ScheduleItem {
+  _id: number;
+}
 interface ModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (item: any) => void;
+  fetchData: () => void;
+  scheduleID:ScheduleItem |undefined
 }
-const DeleteScheduleModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+const DeleteScheduleModal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+fetchData,
+scheduleID
+}): JSX.Element => {
+console.log(scheduleID)
+  const handleDelete = async () => {
+    const apiEndpoint = `delete/${scheduleID?._id}`;
+    const response = await fetchHelper({
+      url: apiEndpoint,
+      method: "DELETE",
+    });
+
+    toast.success(response?.msg || "Scheduled Delete successfully");
+    fetchData();
+    onClose(undefined)
+  };
   return (
     <>
       {isOpen && (
@@ -20,7 +45,7 @@ const DeleteScheduleModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
               >
                 Cancel
               </button>
-              <button className="px-6 py-2 bg-red-800 text-white rounded ">
+              <button className="px-6 py-2 bg-red-800 text-white rounded " onClick={handleDelete}>
                 Delete
               </button>
             </div>
