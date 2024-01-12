@@ -20,6 +20,7 @@ interface ModalProps {
   onClose: (item: any) => void;
   fetchData: () => void;
   editData: ScheduleItem | undefined;
+  editMode:boolean;
 }
 
 const initialFormValues = {
@@ -37,6 +38,7 @@ const ScheduleModal: React.FC<ModalProps> = ({
   onClose,
   fetchData,
   editData,
+  editMode
 }): JSX.Element => {
   const [formData, setFormData] = useState<ScheduleItem>(
     editData ?? initialFormValues
@@ -87,7 +89,7 @@ const ScheduleModal: React.FC<ModalProps> = ({
         <div className="fixed inset-0 flex items-center justify-end">
           <div className="bg-white p-4 rounded-lg shadow-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/3 max-w-lg border border-zinc-300 mr-40 ">
             <div className="flex justify-start items-center">
-              {editData ? (
+              {editMode ? (
                 <h4 className="text-slate-500 font-medium">Edit Schedule</h4>
               ) : (
                 <h4 className="text-slate-500 font-medium">Add Schedule</h4>
@@ -214,7 +216,7 @@ const ScheduleModal: React.FC<ModalProps> = ({
                     Cancel
                   </button>
 
-                  {editData ? (
+                  {editMode ? (
                     <button
                     className={`px-6 py-2 main-color text-white rounded ${
                       Object.entries(formData)
