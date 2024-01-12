@@ -29,7 +29,7 @@ const ListOfSchedules: React.FC = (): JSX.Element => {
   const [scheduleData, setScheduleData] = useState<ScheduleItem[]>([]);
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [editData, setEditData] = useState<ScheduleItem>();
-const [scheduleID, setScheduleID] = useState<ScheduleItem>();
+  const [scheduleID, setScheduleID] = useState<ScheduleItem>();
 
   const handleAddModal = (item: any): void => {
     setIsModalOpen((prev: boolean) => !prev);
@@ -41,7 +41,7 @@ const [scheduleID, setScheduleID] = useState<ScheduleItem>();
   };
 
   const handleDeleteModal = (item: ScheduleItem) => {
-    setScheduleID(item)
+    setScheduleID(item);
     setIsDeleteModalOpen((prev: boolean) => !prev);
   };
 
@@ -50,7 +50,7 @@ const [scheduleID, setScheduleID] = useState<ScheduleItem>();
       const response = await fetchHelper({
         url: "get",
       });
-      setScheduleData(response);
+      setScheduleData(response ? response : []);
       setLoadingData(false);
     } finally {
       setLoadingData(false);
@@ -62,9 +62,9 @@ const [scheduleID, setScheduleID] = useState<ScheduleItem>();
       let url = "search";
       if (searchKeyword.trim() !== "") {
         url += `?title=${encodeURIComponent(searchKeyword)}`;
-      }
+      }else  return
       const response = await fetchHelper({ url });
-      setScheduleData(response);
+      setScheduleData(response ? response : []);
     } catch (error: any) {
       console.error("Error fetching search data:", error.message);
     } finally {
@@ -75,12 +75,8 @@ const [scheduleID, setScheduleID] = useState<ScheduleItem>();
   useEffect(() => {
     fetchData();
   }, []);
+  
 
-  useEffect(() => {
-    if (searchKeyword.trim() !== "") {
-      fetchSearchData();
-    }
-  }, [searchKeyword]);
 
   return (
     <>
@@ -95,13 +91,25 @@ const [scheduleID, setScheduleID] = useState<ScheduleItem>();
                 <input
                   type="text"
                   placeholder="Search"
-                  className="border-none outline-none search-color font-bold w-full"
+                  className="border-none outline-none search-color font-bold w-full "
                   value={searchKeyword}
+                  onKeyUp={(e)=>{
+                    if(e.key==='Enter'){
+                      fetchSearchData()
+                    }
+                  }}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    if(e.target.value==="") fetchData()
                     setSearchKeyword(e.target.value);
+
                   }}
                 />
-                <img src={searchImg} alt="" className="ml-2" />
+                <img
+                  src={searchImg}
+                  alt=""
+                  className="ml-2 cursor-pointer"
+                  onClick={fetchSearchData}
+                />
               </div>
               <button
                 className="w-full sm:w-32 flex justify-around py-2 px-2 btn-border main-color text-white rounded"
