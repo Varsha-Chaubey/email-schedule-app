@@ -1,8 +1,9 @@
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const DEV: boolean = true;
-const BASE_URL: string = DEV ? "http://localhost:8000/schedules/" : "";
+const DEV: boolean = false;
+const SERVER_URL ="https://email-scheduler-g3kn.onrender.com/schedules/"
+const BASE_URL: string = DEV ? "http://localhost:8000/schedules/" : SERVER_URL;
 
 interface FetchHelperOptions {
   url: string;
@@ -23,8 +24,10 @@ const fetchHelper = async ({
 
     const response = await fetch(fullUrl, {
       method,
+     
       headers: {
         "Content-Type": "application/json",
+        'Access-Control-Allow-Origin': '*',
         ...headers,
       },
       body: body ? JSON.stringify(body) : null,
