@@ -26,7 +26,7 @@ const Table: React.FC<TableProps> = ({
 }):JSX.Element => {
   return (
     <>
-      {loading ? (
+      {loading? (
         <div className="mt-8 w-full sm:w-auto">{"Loading Schedules...."}</div>
       ) : (
         <>

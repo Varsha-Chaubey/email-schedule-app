@@ -22,7 +22,7 @@ interface ScheduleItem {
 }
 
 const ListOfSchedules: React.FC = (): JSX.Element => {
-  const [loadingData, setLoadingData] = useState<boolean>(false);
+  const [loadingData, setLoadingData] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
