@@ -18,7 +18,6 @@ const DeleteScheduleModal: React.FC<ModalProps> = ({
 fetchData,
 scheduleID
 }): JSX.Element => {
-console.log(scheduleID)
   const handleDelete = async () => {
     const apiEndpoint = `delete/${scheduleID?._id}`;
     const response = await fetchHelper({
