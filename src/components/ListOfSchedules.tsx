@@ -136,6 +136,7 @@ const ListOfSchedules: React.FC = (): JSX.Element => {
             onClose={isModalOpen ? handleAddModal : handleEditModal}
             fetchData={fetchData}
             editData={editData}
+            editMode={isEditModalOpen}
           />
           <DeleteScheduleModal
             isOpen={isDeleteModalOpen}
