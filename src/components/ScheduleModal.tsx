@@ -81,7 +81,6 @@ const ScheduleModal: React.FC<ModalProps> = ({
     onClose(undefined);
   };
 
-  console.log(formData)
   return (
     <>
       {isOpen && (
